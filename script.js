@@ -37,7 +37,7 @@ function clearForm() {
     document.getElementById("title").value = "";
     document.getElementById("author").value = "";
     document.getElementById("genre").value = "";
-    document.getElementById("status").value = "Unread";
+    document.getElementById("status").value = "";
     document.getElementById("image").value = "";
 }
 
@@ -45,6 +45,22 @@ function deleteBook(id) {
     books = books.filter(book => book.id !== id);
     saveBooks();
     displayBooks();
+}
+
+function editBook(index) {
+    const book = books[index];
+    const title = prompt('Edit title:', book.title);
+    const author = prompt('Edit author:', book.author);
+    const genre = prompt('Edit genre:', book.genre);
+    const status = prompt('Edit status:', book.status);
+    const image = prompt('Edit image URL:', book.image);
+    const favorite = confirm('Is this book a favorite?');
+  
+    if (title && author && genre && status && image !== null) {
+      books[index] = { ...book, title, author, genre, status, image, favorite };
+      saveBooksToLocalStorage(); // We are saving to localStorage
+      renderBooks();
+    }
 }
 
 function toggleFavorite(id) {
@@ -71,11 +87,13 @@ function displayBooks() {
     const favorites = document.getElementById("favorites");
     const unread = document.getElementById("unread");
     const read = document.getElementById("read");
+    const reading = document.getElementById("reading");
 
     all.innerHTML = renderBooks(books);
     favorites.innerHTML = renderBooks(books.filter(book => book.favorite));
     unread.innerHTML = renderBooks(books.filter(book => book.status === "Unread"));
     read.innerHTML = renderBooks(books.filter(book => book.status === "Read"));
+    reading.innerHTML = renderBooks(books.filter(book => book.status === "Reading"));
 }
 
 function renderBooks(bookArray) {
@@ -88,9 +106,10 @@ function renderBooks(bookArray) {
                     <p class='card-text'>${book.author}</p>
                     <small class='text-muted'>${book.genre} - ${book.status}</small><br>
                     <button class='btn btn-sm btn-warning me-1 mt-2' onclick="toggleFavorite('${book.id}')">
-                        ${book.favorite ? '★' : '☆'}
+                        ${book.favorite ? 'Favorite' : 'Unfavorite'}
                     </button>
                     <button class='btn btn-sm btn-danger mt-2' onclick="deleteBook('${book.id}')">Delete</button>
+                    <button class='btn btn-sm btn-danger mt-2' onclick="editBook('${book.id}')">Edit</button>
                 </div>
             </div>
         `).join("") + `</div>`;

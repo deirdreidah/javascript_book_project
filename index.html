@@ -10,16 +10,19 @@
 <body>
     <div class="container mt-5">
         <h2>Book Management System</h2>
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search books by title or author" oninput="searchBooks()">
         <ul class="nav nav-tabs" id="bookTabs">
             <li class="nav-item"><a class="nav-link active" href="#all" data-bs-toggle="tab">All Books</a></li>
             <li class="nav-item"><a class="nav-link" href="#favorites" data-bs-toggle="tab">Favorites</a></li>
             <li class="nav-item"><a class="nav-link" href="#unread" data-bs-toggle="tab">Unread</a></li>
+            <li class="nav-item"><a class="nav-link" href="#reading" data-bs-toggle="tab">Reading</a></li>
             <li class="nav-item"><a class="nav-link" href="#read" data-bs-toggle="tab">Read</a></li>
         </ul>
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active" id="all"></div>
             <div class="tab-pane fade" id="favorites"></div>
             <div class="tab-pane fade" id="unread"></div>
+            <div class="tab-pane fade" id="reading"></div>
             <div class="tab-pane fade" id="read"></div>
         </div>
         <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addBookModal">Add Book</button>
@@ -36,10 +39,19 @@
                 <div class="modal-body">
                     <input type="text" id="title" placeholder="Title" class="form-control mb-2">
                     <input type="text" id="author" placeholder="Author" class="form-control mb-2">
-                    <input type="text" id="genre" placeholder="Genre" class="form-control mb-2">
+                    <select id="genre" class="form-select mb-2">
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Business">Business</option>
+                        <option value="Biography">Biography</option>
+                        <option value="History">History</option>
+                    </select>
                     <select id="status" class="form-select mb-2">
                         <option value="Unread">Unread</option>
                         <option value="Read">Read</option>
+                        <option value="Reading">Reading</option>
                     </select>
                     <input type="file" id="image" class="form-control">
                 </div>
