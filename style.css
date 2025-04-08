@@ -1,0 +1,37 @@
+body {
+    background-color: #b1b3b5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card {
+    max-width: 250px;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body h5 {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.tab-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+}
