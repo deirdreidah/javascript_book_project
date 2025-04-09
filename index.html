@@ -12,13 +12,13 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="text-center">📚 Book Management System</h2>
       <!-- Add Book Button -->
-      <button class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#addBookModal">+ Add Book</button>
+      <button class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#addBookModal">Add New Book</button>
     </div>
 
       <input 
         type="text" 
         class="form-control mb-3 search-input" 
-        placeholder="Search All books by Title or Author..." 
+        placeholder="Search Books by Title or Author" 
         onkeyup="searchBooks(this)">
 
         <!-- Tabs for Book Categories -->
@@ -26,7 +26,9 @@
             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#allBooks">All Books</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#favorites">Favorites</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#unread">Unread</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#reading">Reading</a></li>
             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#read">Read</a></li>
+    
         </ul>
 
         <!-- Tab Content -->
@@ -39,6 +41,9 @@
           </div>
           <div id="unread" class="tab-pane fade">
               <div class="row" id="unreadList"></div>
+          </div>
+          <div id="reading" class="tab-pane fade">
+              <div class="row" id="readingList"></div>
           </div>
           <div id="read" class="tab-pane fade">
               <div class="row" id="readList"></div>
@@ -68,21 +73,30 @@
                       </div>
                       <div class="mb-2">
                           <label>Genre</label>
-                          <input type="text" id="genre" class="form-control" required>
-                      </div>
+                          <select id="genre" class="form-control">
+                              <option value="Fantasy">Fantasy</option>
+                              <option value="Romance">Romance</option>
+                              <option value="Mystery">Mystery</option>
+                              <option value="Horror">Horror</option>
+                              <option value="Biography">Biography</option>
+                              <option value="History">History</option>
+                              <option value="Self-help">Self-help</option>
+                              <option value="Business">Business</option>
+                         </select>
+                     </div>
                       <div class="mb-2">
                           <label>Status</label>
                           <select id="status" class="form-control">
                               <option value="Unread">Unread</option>
+                              <option value="Reading">Reading</option>
                               <option value="Read">Read</option>
-                              <option value="Read">Favorites</option>
                           </select>
                       </div>
                       <div class="mb-2">
-                          <label>Upload Book Cover Image</label>
+                          <label>Upload Book Cover</label>
                           <input type="file" id="image" class="form-control">
                       </div>
-                      <button type="submit" class="btn btn-success">Save</button>
+                      <button type="submit" class="btn btn-success">Add Book</button>
                   </form>
               </div>
           </div>
@@ -93,6 +107,6 @@
 
   <!--Bootstrap JS import-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="index.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
