@@ -1,108 +1,203 @@
-let books = JSON.parse(localStorage.getItem("books")) || [];
+// References to elements
+const bookForm = document.getElementById("bookForm");
+const bookList = document.getElementById("bookList");
+const favoriteList = document.getElementById("favoriteList");
+const unreadList = document.getElementById("unreadList");
+const readingList = document.getElementById("readingList");
+const readList = document.getElementById("readList");
 
-function saveBooks() {
-    localStorage.setItem("books", JSON.stringify(books));
-}
+document.addEventListener("DOMContentLoaded", () => {
+  loadBooks();
+});
 
-function addBook() {
-    const title = document.getElementById("title").value;
-    const author = document.getElementById("author").value;
-    const genre = document.getElementById("genre").value;
-    const status = document.getElementById("status").value;
-    const imageInput = document.getElementById("image");
-    const image = imageInput.files.length ? URL.createObjectURL(imageInput.files[0]) : DEFAULT_IMAGE;
+document.getElementById("bookForm").addEventListener("submit", function (event) {
+  event.preventDefault();
 
-    if (!title || !author || !genre) {
-        alert("All fields are required.");
-        return;
-    }
+  // Input values
+  const bookId = document.getElementById("bookId").value.trim();
+  const title = document.getElementById("title").value.trim();
+  const author = document.getElementById("author").value.trim();
+  const genre = document.getElementById("genre").value.trim();
+  const status = document.getElementById("status").value;
+  const imageInput = document.getElementById("image");
 
+  // Validate required values
+  if (!title || !author ) {
+    alert("All fields are required!");
+    return;
+  }
+
+  // Process the image if available
+  const imageFile = imageInput.files[0];
+  if (imageFile) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      saveBook(bookId, title, author, genre, status, reader.result);
+    };
+    reader.readAsDataURL(imageFile);
+  } else {
+    saveBook(bookId, title, author, genre, status, "");
+  }
+});
+
+// Save or update book functionality
+function saveBook(bookId, title, author, genre, status, image) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  if (bookId) {
+    // Update existing book
+    books = books.map(book =>
+      book.id === bookId
+        ? { ...book, title, author, genre, status, image: image || book.image }
+        : book
+    );
+  } else {
+    // Add new book
     const newBook = {
-        id: Date.now().toString(),
-        title,
-        author,
-        genre,
-        status,
-        favorite: false,
-        image
+      id: crypto.randomUUID(), 
+      title,
+      author,
+      genre,
+      status,
+      image,
+      favorite: false
     };
     books.push(newBook);
-    saveBooks();
-    displayBooks();
-    alert("Book added successfully!");
-    clearForm();
+  }
+
+  // Save to localStorage
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
+
+  // Reset form and close modal
+  document.getElementById("bookForm").reset();
+  document.getElementById("bookId").value = ""; 
+  bootstrap.Modal.getInstance(document.getElementById("addBookModal")).hide();
 }
 
-function clearForm() {
-    document.getElementById("title").value = "";
-    document.getElementById("author").value = "";
-    document.getElementById("genre").value = "";
-    document.getElementById("status").value = "Unread";
-    document.getElementById("image").value = "";
+// Open Edit Modal
+function openEditBookModal(bookId) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+  let book = books.find(b => b.id === bookId);
+
+  if (!book) {
+    console.error("Book not found!");
+    return;
+  }
+
+  // Open modal
+  let modalElement = document.getElementById("addBookModal");
+  let modal = new bootstrap.Modal(modalElement);
+  modal.show();
+
+  setTimeout(() => {
+    // Update modal title and button text
+    document.querySelector(".modal-title").innerText = "Edit Book";
+    document.querySelector("button[type='submit']").innerText = "Update Book";
+
+    // Pre-fill form with book data
+    document.getElementById("bookId").value = book.id;
+    document.getElementById("title").value = book.title;
+    document.getElementById("author").value = book.author;
+    document.getElementById("genre").value = book.genre;
+    document.getElementById("status").value = book.status;
+  }, 100);
 }
 
-function deleteBook(id) {
-    books = books.filter(book => book.id !== id);
-    saveBooks();
-    displayBooks();
+// Fetch and load books
+function loadBooks() {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  // Clear the lists
+  bookList.innerHTML = "";
+  favoriteList.innerHTML = "";
+  unreadList.innerHTML = "";
+  readList.innerHTML= "";
+  readList.innerHTML = "";
+
+  books.forEach((book) => {
+    const bookCard = createBookCard(book);
+
+    // Append to correct tab
+    bookList.appendChild(bookCard);
+    if (book.favorite) favoriteList.appendChild(createBookCard(book));
+
+    if (book.status === "Unread") unreadList.appendChild(createBookCard(book));
+
+    else if (book.status === "Reading") {
+        readingList.appendChild(createBookCard(book));}
+        
+    else readList.appendChild(createBookCard(book));
+  });
 }
 
-function editBook(index) {
-    const book = books[index];
-    const title = prompt('Edit title:', book.title);
-    const author = prompt('Edit author:', book.author);
-    const genre = prompt('Edit genre:', book.genre);
-    const status = prompt('Edit status:', book.status);
-    const image = prompt('Edit image URL:', book.image);
-    const favorite = confirm('Is this book a favorite?');
-  
-    if (title && author && genre && status && image !== null) {
-      books[index] = { ...book, title, author, genre, status, image, favorite };
-      saveBooksToLocalStorage(); // Save to localStorage
-      renderBooks();
-    }
-}
+// Toggle favorite status
+function toggleFavorite(bookId) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
 
-function toggleFavorite(id) {
-    const book = books.find(b => b.id === id);
-    if (book) {
-        book.favorite = !book.favorite;
-        saveBooks();
-        displayBooks();
+  books = books.map(book => {
+    if (book.id === bookId) {
+      return { ...book, favorite: !book.favorite };
     }
+    return book;
+  });
+
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
 }
 
-function displayBooks() {
-    const all = document.getElementById("all");
-    const favorites = document.getElementById("favorites");
-    const unread = document.getElementById("unread");
-    const read = document.getElementById("read");
-    const reading = document.getElementById("reading");
+// Create book card
+function createBookCard(book) {
+  const card = document.createElement("div");
+  card.className = "col-md-3 mb-3";
+  card.innerHTML = `
+    <div class="card shadow-sm">
+      <img src="${book.image || "cover-placeholder.jpg"}" class="card-img-top" alt="Book Cover">
+      <div class="card-body">
+          <h5 class="card-title">${book.title}</h5>
+          <p class="card-text">Author: ${book.author}</p>
+          <p class="card-text"><small>Genre: ${book.genre}</small></p>
+          <p class="card-text"><small>Status: ${book.status}</small></p>
+          <button class="btn btn-sm btn-danger" onclick="deleteBook('${book.id}')">Delete</button>
+          <button class="btn btn-sm btn-info" onclick="openEditBookModal('${book.id}')">Edit</button>
+          <button class="btn btn-sm ${book.favorite ? "btn-warning" : "btn-outline-warning"}" onclick="toggleFavorite('${book.id}')">
+            ${book.favorite ? "Unfavorite" : "Favorite"}
+          </button>
+      </div>
+    </div>
+  `;
 
-    all.innerHTML = renderBooks(books);
-    favorites.innerHTML = renderBooks(books.filter(book => book.favorite));
-    unread.innerHTML = renderBooks(books.filter(book => book.status === "Unread"));
-    read.innerHTML = renderBooks(books.filter(book => book.status === "Read"));
-    reading.innerHTML = renderBooks(books.filter(book => book.status === "Reading"));
+  return card;
 }
 
-function renderBooks(bookArray) {
-    return `<div class='d-flex flex-wrap gap-3'>` +
-        bookArray.map(book => `
-            <div class='card' style='width: 12rem;'>
-                <img src='${book.image}' class='card-img-top' style='height: 180px; object-fit: cover;' alt='Book Cover'>
-                <div class='card-body'>
-                    <h5 class='card-title'>${book.title}</h5>
-                    <p class='card-text'>${book.author}</p>
-                    <small class='text-muted'>${book.genre} - ${book.status}</small><br>
-                    <button class='btn btn-sm btn-warning me-1 mt-2' onclick="toggleFavorite('${book.id}')">
-                        ${book.favorite ? 'favorite' : ''}
-                    </button>
-                    <button class='btn btn-sm btn-danger mt-2' onclick="deleteBook('${book.id}')">Delete</button>
-                    <button class='btn btn-sm btn-danger mt-2' onclick="editBook('${book.id}')">Edit</button>
-                </div>
-            </div>
-    `).join("") + `</div>`;
+// Function to delete a book
+function deleteBook(bookId) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+  books = books.filter((book) => book.id !== bookId);
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
 }
 
-displayBooks();
+function searchBooks(input) {
+  let query = input.value.toLowerCase().trim();
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  // Filter books based on search query
+  let filteredBooks = books.filter(book => 
+    book.title.toLowerCase().includes(query) || 
+    book.author.toLowerCase().includes(query)
+  );
+
+  // Clear and update book list with search results
+  let bookList = document.getElementById("bookList"); 
+  bookList.innerHTML = ""; // Clear current list
+
+  filteredBooks.forEach(book => {
+    bookList.appendChild(createBookCard(book));
+  });
+
+  // If no books match, show a "No results found" message
+  if (filteredBooks.length === 0) {
+    bookList.innerHTML = `<p class="text-center text-muted">No books found</p>`;
+  }
+}
